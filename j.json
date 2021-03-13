@@ -1,0 +1,94 @@
+[ [ "by.bsu.fpmi.siachko.lab1.sportevent.events.race.Race", {
+  "date" : {
+    "dayOfWeek" : "Monday",
+    "day" : 22,
+    "month" : 10,
+    "year" : 1979
+  },
+  "place" : {
+    "country" : "a",
+    "region" : "b",
+    "locality" : "c",
+    "zipCode" : "d",
+    "address" : "e"
+  },
+  "attendance" : {
+    "peopleUntil18" : 1,
+    "peopleUntil30" : 2,
+    "peopleUntil45" : 3,
+    "peopleUntil60" : 4,
+    "peopleAfter60" : 5
+  },
+  "raceName" : "abacaba",
+  "raceParticipants" : [ {
+    "name" : "a",
+    "result" : {
+      "time" : "00:01:02,56"
+    }
+  }, {
+    "name" : "a",
+    "result" : {
+      "time" : "00:01:02,56"
+    }
+  } ]
+} ], [ "by.bsu.fpmi.siachko.lab1.sportevent.events.game.Game", {
+  "date" : {
+    "dayOfWeek" : "Tuesday",
+    "day" : 23,
+    "month" : 10,
+    "year" : 1979
+  },
+  "place" : {
+    "country" : "a",
+    "region" : "b",
+    "locality" : "c",
+    "zipCode" : "d",
+    "address" : "e"
+  },
+  "attendance" : {
+    "peopleUntil18" : 2,
+    "peopleUntil30" : 5,
+    "peopleUntil45" : 17,
+    "peopleUntil60" : 3,
+    "peopleAfter60" : 8
+  },
+  "gameName" : "addcd",
+  "gameParticipant1" : {
+    "name" : "fghfd",
+    "points" : 12
+  },
+  "gameParticipant2" : {
+    "name" : "tyu",
+    "points" : 24
+  }
+} ], [ "by.bsu.fpmi.siachko.lab1.sportevent.events.match.Match", {
+  "date" : {
+    "dayOfWeek" : "Tuesday",
+    "day" : 23,
+    "month" : 10,
+    "year" : 1979
+  },
+  "place" : {
+    "country" : "a",
+    "region" : "b",
+    "locality" : "c",
+    "zipCode" : "d",
+    "address" : "e"
+  },
+  "attendance" : {
+    "peopleUntil18" : 56,
+    "peopleUntil30" : 43,
+    "peopleUntil45" : 78,
+    "peopleUntil60" : 94,
+    "peopleAfter60" : 2
+  },
+  "matchName" : "poytr",
+  "matchParticipant1" : {
+    "name" : "mngfd",
+    "result" : true
+  },
+  "matchParticipant2" : {
+    "name" : "rtre",
+    "result" : false
+  }
+} ] ]

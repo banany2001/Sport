@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<eventsList>
+    <list xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="race">
+        <attendance>
+            <after_60>5</after_60>
+            <until_18>1</until_18>
+            <until_30>2</until_30>
+            <until_45>3</until_45>
+            <until_60>4</until_60>
+        </attendance>
+        <date>
+            <day>22</day>
+            <dayOfWeek>Monday</dayOfWeek>
+            <month>10</month>
+            <year>1979</year>
+        </date>
+        <place>
+            <address>e</address>
+            <country>a</country>
+            <locality>c</locality>
+            <region>b</region>
+            <zipCode>d</zipCode>
+        </place>
+        <raceName>abacaba</raceName>
+        <Participants/>
+    </list>
+</eventsList>

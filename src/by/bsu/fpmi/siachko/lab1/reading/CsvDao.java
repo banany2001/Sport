@@ -15,6 +15,9 @@ import by.bsu.fpmi.siachko.lab1.sportevent.property.place.Place;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,194 +42,107 @@ public class CsvDao<T extends SportEvent> extends AbstractDao<T> {
         );
     }
 
-    private Date readDate()
+    private void writeNativeObject(Object object, Class<?> tClass)
     {
-        String dayOfWeek = lineScanner.next();
-        int day = Integer.parseInt(lineScanner.next());
-        int month = Integer.parseInt(lineScanner.next());
-        int year = Integer.parseInt(lineScanner.next());
-        return new Date(dayOfWeek, day, month, year);
+        printWriter.print(tClass.getCanonicalName());
+        printWriter.print(";");
+        printWriter.print(object);
     }
 
-    private void writeDate(Date date)
+    private void writeObject(Object object, Class<?> tClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
     {
-        printWriter.print(date.getDayOfWeek());
-        printWriter.print(";");
-        printWriter.print(date.getDay());
-        printWriter.print(";");
-        printWriter.print(date.getMonth());
-        printWriter.print(";");
-        printWriter.print(date.getYear());
-        printWriter.print(";");
+        if (tClass.getPackage().equals(Integer.class.getPackage())){
+            writeNativeObject(object, tClass);
+            return;
+        }
+        printWriter.print(tClass.getCanonicalName());
+        if (!tClass.getSuperclass().equals(Object.class)){
+            printWriter.print(";");
+            writeObject(object, tClass.getSuperclass());
+        }
+        Field[] fields = tClass.getDeclaredFields();
+        for (Field field : fields){
+            String fieldName = field.getName();
+            if (fieldName.equals("total")){
+                continue;
+            }
+            printWriter.print(";");
+            StringBuilder getterName = new StringBuilder();
+            if (field.getType().equals(Boolean.class) || field.getType().getName().equals("boolean")){
+                getterName.append("is");
+            }
+            else {
+                getterName.append("get");
+            }
+            getterName.append(Character.toUpperCase(fieldName.charAt(0))).append(fieldName.substring(1));
+            Method getter = tClass.getMethod(getterName.toString());
+            Object getterResult = getter.invoke(object);
+
+            if (!fieldName.equals("raceParticipants")){
+                writeObject(getterResult, getterResult.getClass());
+                continue;
+            }
+
+            printWriter.print("ArrayList;");
+            ArrayList<RaceParticipant> raceParticipants = (ArrayList<RaceParticipant>) getterResult;
+            printWriter.print(raceParticipants.size());
+            for (RaceParticipant participant : raceParticipants){
+                printWriter.print(";");
+                writeObject(participant, participant.getClass());
+            }
+        }
     }
 
-    private Place readPlace()
+    private Object readNativeObject(Class<?> tClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        String country = lineScanner.next();
-        String region = lineScanner.next();
-        String locality = lineScanner.next();
-        String zipCode = lineScanner.next();
-        String address = lineScanner.next();
-        return new Place(country, region, locality, zipCode, address);
+        return tClass.getConstructor(String.class).newInstance(lineScanner.next());
     }
 
-    private void writePlace(Place place)
-    {
-        printWriter.print(place.getCountry());
-        printWriter.print(";");
-        printWriter.print(place.getRegion());
-        printWriter.print(";");
-        printWriter.print(place.getLocality());
-        printWriter.print(";");
-        printWriter.print(place.getZipCode());
-        printWriter.print(";");
-        printWriter.print(place.getAddress());
-        printWriter.print(";");
-    }
-
-    private Attendance readAttendance()
-    {
-        int peopleUntil18 = Integer.parseInt(lineScanner.next());
-        int peopleUntil30 = Integer.parseInt(lineScanner.next());
-        int peopleUntil45 = Integer.parseInt(lineScanner.next());
-        int peopleUntil60 = Integer.parseInt(lineScanner.next());
-        int peopleAfter60 = Integer.parseInt(lineScanner.next());
-        return new Attendance(peopleUntil18, peopleUntil30, peopleUntil45, peopleUntil60, peopleAfter60);
-    }
-
-    private void writeAttendance(Attendance attendance)
-    {
-        printWriter.print(attendance.getPeopleUntil18());
-        printWriter.print(";");
-        printWriter.print(attendance.getPeopleUntil30());
-        printWriter.print(";");
-        printWriter.print(attendance.getPeopleUntil45());
-        printWriter.print(";");
-        printWriter.print(attendance.getPeopleUntil60());
-        printWriter.print(";");
-        printWriter.print(attendance.getPeopleAfter60());
-        printWriter.print(";");
-    }
-
-    private RaceParticipant readRaceParticipant() throws Exception
-    {
-        String name = lineScanner.next();
-        String result = lineScanner.next();
-        return new RaceParticipant(name, new Result(result));
-    }
-
-    private void writeRaceParticipant(RaceParticipant participant)
-    {
-        printWriter.print(participant.getName());
-        printWriter.print(";");
-        printWriter.print(participant.getResult());
-        printWriter.print(";");
-    }
-
-    private MatchParticipant readMatchParticipant()
-    {
-        String name = lineScanner.next();
-        boolean result = Boolean.parseBoolean(lineScanner.next());
-        return new MatchParticipant(name, result);
-    }
-
-    private void writeMatchParticipant(MatchParticipant participant)
-    {
-        printWriter.print(participant.getName());
-        printWriter.print(";");
-        printWriter.print(participant.getResult());
-        printWriter.print(";");
-    }
-
-    private GameParticipant readGameParticipant()
-    {
-        String name = lineScanner.next();
-        int result = Integer.parseInt(lineScanner.next());
-        return new GameParticipant(name, result);
-    }
-
-    private void writeGameParticipant(GameParticipant participant)
-    {
-        printWriter.print(participant.getName());
-        printWriter.print(";");
-        printWriter.print(participant.getPoints());
-        printWriter.print(";");
-    }
-
-    private SportEvent readEvent() throws Exception
+    private Object readObject(Object object) throws Exception, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
 
-        String type = lineScanner.next();
-        Date date = readDate();
-        Place place = readPlace();
-        Attendance attendance = readAttendance();
-        String name = lineScanner.next();
+        Class<?> tClass = Class.forName(lineScanner.next());
+        if (tClass.getPackage().equals(Integer.class.getPackage())){
+            return readNativeObject(tClass);
+        }
+        if (object == null){
+            object = tClass.getConstructor().newInstance();
+        }
+        if (!tClass.getSuperclass().equals(Object.class)){
+            readObject(object);
+        }
+        Field[] fields = tClass.getDeclaredFields();
+        for (Field field : fields){
 
-        if (type.equals("Race")){
+            String fieldName = field.getName();
+            if (fieldName.equals("total")){
+                continue;
+            }
+            System.out.println(fieldName);
+            StringBuilder setterName = new StringBuilder().append("set")
+                    .append(Character.toUpperCase(fieldName.charAt(0)))
+                    .append(fieldName.substring(1));
+            Method setter = tClass.getMethod(setterName.toString(), field.getType());
+
+            if (!fieldName.equals("raceParticipants")){
+                setter.invoke(object, readObject(null));
+                continue;
+            }
+
+            String className = lineScanner.next();
             int n;
             n = Integer.parseInt(lineScanner.next());
             ArrayList<RaceParticipant> raceParticipants = new ArrayList<>();
             while (n != 0){
-                raceParticipants.add(readRaceParticipant());
+                raceParticipants.add((RaceParticipant) readObject(null));
                 n--;
             }
-            return new Race(date, place, attendance, name, raceParticipants);
-        }
-        else if (type.equals("Match")){
-            MatchParticipant participant1, participant2;
-            participant1 = readMatchParticipant();
-            participant2 = readMatchParticipant();
-            return new Match(date, place, attendance, name, participant1, participant2);
-        }
-        else if (type.equals("Game")){
-            GameParticipant participant1, participant2;
-            participant1 = readGameParticipant();
-            participant2 = readGameParticipant();
-            return new Game(date, place, attendance, name, participant1, participant2);
-        }
-        return null;
 
-    }
+            setter.invoke(object, raceParticipants);
 
-    private void writeEvent(SportEvent event)
-    {
-
-        if (event.getClass().equals(Race.class)){
-            printWriter.print("Race;");
-        }
-        else if (event.getClass().equals(Match.class)){
-            printWriter.print("Match;");
-        }
-        else if (event.getClass().equals(Game.class)){
-            printWriter.print("Game;");
-        }
-        writeDate(event.getDate());
-        writePlace(event.getPlace());
-        writeAttendance(event.getAttendance());
-
-        if (event.getClass().equals(Race.class)){
-            Race race = (Race) event;
-            printWriter.print(race.getRaceName() + ";");
-            ArrayList<RaceParticipant> raceParticipants = race.getRaceParticipants();
-            printWriter.print(raceParticipants.size());
-            printWriter.print(";");
-            for (RaceParticipant participant : raceParticipants){
-                writeRaceParticipant(participant);
-            }
-        }
-        else if (event.getClass().equals(Match.class)){
-            Match match = (Match) event;
-            printWriter.print(match.getMatchName() + ";");
-            writeMatchParticipant(match.getMatchParticipant1());
-            writeMatchParticipant(match.getMatchParticipant2());
-        }
-        else if (event.getClass().equals(Game.class)){
-            Game game = (Game) event;
-            printWriter.print(game.getGameName() + ";");
-            writeGameParticipant(game.getGameParticipant1());
-            writeGameParticipant(game.getGameParticipant2());
         }
 
+        return object;
     }
 
     @Override
@@ -236,18 +152,18 @@ public class CsvDao<T extends SportEvent> extends AbstractDao<T> {
         scanner = new Scanner(new File(fileName));
         while (scanner.hasNextLine()){
             lineScanner = new Scanner(scanner.nextLine()).useDelimiter(";");
-            list.add((T)readEvent());
+            list.add((T) readObject(null));
         }
         return list;
     }
 
     @Override
-    public void write(List<T> list) throws IOException
+    public void write(List<T> list) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException
     {
         printWriter = new PrintWriter(new File(fileName));
-        for (SportEvent sportEvent : list)
+        for (T object : list)
         {
-            writeEvent(sportEvent);
+            writeObject(object, object.getClass());
             printWriter.println();
         }
         printWriter.close();

@@ -26,7 +26,7 @@ public class MatchParticipant extends Participant{
     }
 
     @XmlElement
-    public boolean getResult() {
+    public boolean isResult() {
         return result;
     }
 

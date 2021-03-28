@@ -4,6 +4,7 @@ import by.bsu.fpmi.siachko.lab1.sportevent.SportEvent;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public abstract class AbstractDao<T extends SportEvent> implements Dao<T>{
@@ -15,7 +16,7 @@ public abstract class AbstractDao<T extends SportEvent> implements Dao<T>{
     }
 
     public abstract List<T> read() throws IOException, Exception;
-    public abstract void write(List<T> list) throws JAXBException, IOException;
+    public abstract void write(List<T> list) throws JAXBException, IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException;
 
 
 }

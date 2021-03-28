@@ -8,20 +8,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @XmlRootElement()
-public class EventsList {
+public class EventsList<T extends SportEvent> {
 
-    private List<SportEvent> list;
+    private List<T> list;
 
     public EventsList() {
         list = null;
     }
 
     @XmlElement()
-    public List<SportEvent> getList() {
+    public List<T> getList() {
         return list;
     }
 
-    public void setList(List<SportEvent> list) {
+    public void setList(List<T> list) {
         this.list = list;
     }
 }

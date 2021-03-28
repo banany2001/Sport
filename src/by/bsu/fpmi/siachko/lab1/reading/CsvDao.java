@@ -15,18 +15,28 @@ import by.bsu.fpmi.siachko.lab1.sportevent.property.place.Place;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class CSVCustomFileReader extends CustomFileReader{
+public class CsvDao<T extends SportEvent> extends AbstractDao<T> {
 
     private Scanner scanner;
     private Scanner lineScanner;
     private PrintWriter printWriter;
 
-    public CSVCustomFileReader(String fileName) {
+    private CsvDao(String fileName) {
         super(fileName);
+    }
+
+    public static <T> Dao<T> create(String fileName, Class<?> aClass)
+    {
+        return (Dao<T>) Proxy.newProxyInstance(
+                aClass.getClassLoader(),
+                new Class[]{Dao.class},
+                new LoggingProxyHandler<>(new CsvDao(fileName))
+        );
     }
 
     private Date readDate()
@@ -220,19 +230,19 @@ public class CSVCustomFileReader extends CustomFileReader{
     }
 
     @Override
-    public List<SportEvent> read() throws IOException, Exception
+    public List<T> read() throws IOException, Exception
     {
-        List<SportEvent> list = new ArrayList<>();
+        List<T> list = new ArrayList<>();
         scanner = new Scanner(new File(fileName));
         while (scanner.hasNextLine()){
             lineScanner = new Scanner(scanner.nextLine()).useDelimiter(";");
-            list.add(readEvent());
+            list.add((T)readEvent());
         }
         return list;
     }
 
     @Override
-    public void write(List<SportEvent> list) throws IOException
+    public void write(List<T> list) throws IOException
     {
         printWriter = new PrintWriter(new File(fileName));
         for (SportEvent sportEvent : list)

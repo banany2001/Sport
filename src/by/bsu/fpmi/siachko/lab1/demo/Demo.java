@@ -1,20 +1,7 @@
 package by.bsu.fpmi.siachko.lab1.demo;
 
-import by.bsu.fpmi.siachko.lab1.reading.CSVCustomFileReader;
-import by.bsu.fpmi.siachko.lab1.reading.CustomFileReader;
-import by.bsu.fpmi.siachko.lab1.reading.JSONCustomFileReader;
-import by.bsu.fpmi.siachko.lab1.reading.XMLCustomFileReader;
+import by.bsu.fpmi.siachko.lab1.reading.*;
 import by.bsu.fpmi.siachko.lab1.sportevent.SportEvent;
-import by.bsu.fpmi.siachko.lab1.sportevent.events.game.Game;
-import by.bsu.fpmi.siachko.lab1.sportevent.events.match.Match;
-import by.bsu.fpmi.siachko.lab1.sportevent.events.race.Race;
-import by.bsu.fpmi.siachko.lab1.sportevent.participant.GameParticipant;
-import by.bsu.fpmi.siachko.lab1.sportevent.participant.MatchParticipant;
-import by.bsu.fpmi.siachko.lab1.sportevent.participant.RaceParticipant;
-import by.bsu.fpmi.siachko.lab1.sportevent.participant.Result;
-import by.bsu.fpmi.siachko.lab1.sportevent.property.attendance.Attendance;
-import by.bsu.fpmi.siachko.lab1.sportevent.property.date.Date;
-import by.bsu.fpmi.siachko.lab1.sportevent.property.place.Place;
 
 import javax.xml.bind.JAXBException;
 import java.util.*;
@@ -24,14 +11,17 @@ public class Demo {
 
     public static void main(String[] args) throws JAXBException, Exception {
 
-        EventsList list = new EventsList();
+        new LogFile();
+
+        EventsList<SportEvent> list = new EventsList<>();
 
         while (true){
             System.out.println("Select the operation:");
             System.out.println("1 - read the file");
             System.out.println("2 - sort by age group");
             System.out.println("3 - find average attendance by days");
-            System.out.println("4 - Stop the program");
+            System.out.println("4 - write to the file");
+            System.out.println("5 - Stop the program");
 
             Scanner in = new Scanner(System.in);
             int op = in.nextInt();
@@ -40,15 +30,15 @@ public class Demo {
                 System.out.println("Enter the path to the file.");
                 in = new Scanner(System.in);
                 String path = in.nextLine();
-                CustomFileReader reader = null;
+                Dao<SportEvent> inputDao = null;
                 if (Pattern.matches("[-/_:\\\\\\w]+.xml", path)){
-                    reader = new XMLCustomFileReader(path);
+                    inputDao = XMLDao.create(path, SportEvent.class, Demo.class);
                 }
                 else if (Pattern.matches("[-/_:\\\\\\w]+.json", path)){
-                    reader = new JSONCustomFileReader(path);
+                    inputDao = JsonDao.create(path, Demo.class);
                 }
                 else if (Pattern.matches("[-/_:\\\\\\w]+.csv", path)){
-                    reader = new CSVCustomFileReader(path);
+                    inputDao = CsvDao.create(path, Demo.class);
                 }
                 else {
                     System.out.println("Filename is incorrect or this type of file is not supported");
@@ -56,7 +46,7 @@ public class Demo {
                 }
                 try
                 {
-                    list.setList(reader.read());
+                    list.setList(inputDao.read());
                 }
                 catch (Exception ex)
                 {
@@ -168,6 +158,34 @@ public class Demo {
                 System.out.println("Sunday - " + (sum[7] / Math.max(1, cnt[7])) + " people.");
             }
             else if (op == 4){
+                System.out.println("Enter the path to the file.");
+                in = new Scanner(System.in);
+                String path = in.nextLine();
+                Dao<SportEvent> outputDao = null;
+                if (Pattern.matches("[-/_:\\\\\\w]+.xml", path)){
+                    outputDao = XMLDao.create(path, SportEvent.class, Demo.class);
+                }
+                else if (Pattern.matches("[-/_:\\\\\\w]+.json", path)){
+                    outputDao = JsonDao.create(path, Demo.class);
+                }
+                else if (Pattern.matches("[-/_:\\\\\\w]+.csv", path)){
+                    outputDao = CsvDao.create(path, Demo.class);
+                }
+                else {
+                    System.out.println("Filename is incorrect or this type of file is not supported");
+                    continue;
+                }
+                try
+                {
+                    outputDao.write(list.getList());
+                }
+                catch (Exception ex)
+                {
+                    System.out.println("Error while writing to the file: incorrect filename" +
+                            " or incorrect data in the list");
+                }
+            }
+            else if (op == 5){
                 break;
             }
             else {

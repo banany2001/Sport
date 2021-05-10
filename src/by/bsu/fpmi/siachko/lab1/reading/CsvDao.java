@@ -15,6 +15,7 @@ import by.bsu.fpmi.siachko.lab1.sportevent.property.place.Place;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -62,10 +63,25 @@ public class CsvDao<T extends SportEvent> extends AbstractDao<T> {
         }
         Field[] fields = tClass.getDeclaredFields();
         for (Field field : fields){
-            String fieldName = field.getName();
-            if (fieldName.equals("total")){
+
+
+            Annotation[] annotations = field.getDeclaredAnnotations();
+            boolean ignoreFound = false;
+            for (Annotation annotation : annotations){
+                if (annotation.toString().equals("@by.bsu.fpmi.siachko.lab1.reading.CsvIgnore()")){
+                    ignoreFound = true;
+                }
+            }
+
+            if (ignoreFound){
                 continue;
             }
+
+            String fieldName = field.getName();
+            //System.out.println(fieldName);
+            /*if (fieldName.equals("total")){
+                continue;
+            }*/
             printWriter.print(";");
             StringBuilder getterName = new StringBuilder();
             if (field.getType().equals(Boolean.class) || field.getType().getName().equals("boolean")){
@@ -114,11 +130,24 @@ public class CsvDao<T extends SportEvent> extends AbstractDao<T> {
         Field[] fields = tClass.getDeclaredFields();
         for (Field field : fields){
 
-            String fieldName = field.getName();
-            if (fieldName.equals("total")){
+            Annotation[] annotations = field.getDeclaredAnnotations();
+            boolean ignoreFound = false;
+            for (Annotation annotation : annotations){
+                //System.out.println(annotation.toString());
+                if (annotation.toString().equals("@by.bsu.fpmi.siachko.lab1.reading.CsvIgnore()")){
+                    ignoreFound = true;
+                }
+            }
+
+            if (ignoreFound){
                 continue;
             }
-            System.out.println(fieldName);
+
+            String fieldName = field.getName();
+            /*if (fieldName.equals("total")){
+                continue;
+            }*/
+            //System.out.println(fieldName);
             StringBuilder setterName = new StringBuilder().append("set")
                     .append(Character.toUpperCase(fieldName.charAt(0)))
                     .append(fieldName.substring(1));

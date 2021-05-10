@@ -1,5 +1,6 @@
 package by.bsu.fpmi.siachko.lab1.sportevent.participant;
 
+import by.bsu.fpmi.siachko.lab1.reading.CsvIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -12,14 +13,19 @@ public class Result {
     @JsonProperty("time")
     private String time;
 
+    @CsvIgnore
+    private Pattern pattern = Pattern.compile("\\d{2}:[0-5]\\d:[0-5]\\d,\\d{3}");
+
     public Result(String time) throws Exception{
-        if (Pattern.matches("\\d{2}:[0-5]\\d:[0-5]\\d,[0-5]\\d", time)){
+        if (pattern.matcher(time).find()){
             this.time = time;
         }
         else {
             throw new Exception();
         }
     }
+
+    //Pattern.matches("\\d{2}:[0-5]\\d:[0-5]\\d,\\d{3}", time)
 
     public Result()
     {
@@ -32,7 +38,7 @@ public class Result {
     }
 
     public void setTime(String time) throws Exception{
-        if (Pattern.matches("\\d{2}:[0-5]\\d:[0-5]\\d,[0-5]\\d", time)){
+        if (pattern.matcher(time).find()){
             this.time = time;
         }
         else {

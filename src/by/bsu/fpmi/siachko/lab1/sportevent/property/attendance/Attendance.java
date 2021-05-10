@@ -1,5 +1,6 @@
 package by.bsu.fpmi.siachko.lab1.sportevent.property.attendance;
 
+import by.bsu.fpmi.siachko.lab1.reading.CsvIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,6 +22,7 @@ public class Attendance {
     @JsonProperty("peopleAfter60")
     private int peopleAfter60;
     @JsonIgnore
+    @CsvIgnore
     private int total;
 
     public Attendance(int peopleUntil18, int peopleUntil30, int peopleUntil45, int peopleUntil60, int peopleAfter60) {

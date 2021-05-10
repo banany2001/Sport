@@ -19,7 +19,7 @@ public class XMLDao<T extends SportEvent> extends AbstractDao<T> {
     private XMLDao(String fileName, Class<T> tClass) throws JAXBException {
         super(fileName);
         context = JAXBContext.newInstance(tClass, EventsList.class);
-        marshaller= context.createMarshaller();
+        marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
     }
 
